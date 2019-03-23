@@ -1,3 +1,5 @@
 {
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
+    "git.ignoreLimitWarning": true,
+    "python.pythonPath": "C:\\Users\\Waleed\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
 }

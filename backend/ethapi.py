@@ -1,6 +1,7 @@
 import json
 import time
 import requests
+from lxml import html
 from etherscan import accounts, tokens
 
 #Use of Etherscan API to pull wallet balances
@@ -15,7 +16,7 @@ api_key = 'IVPR3T2CWJ2TKUYH6824HNGKKJ4ENEM9EU'
 def init_sov_24_hours():
 
     api = accounts.Account(address=address, api_key=api_key)
-    transactions_24_hours = api.get_transaction_page(offset=10000)
+    transactions_24_hours = api.get_transaction_page(offset=7500)
 
     i = len(transactions_24_hours)    
     latest_24_hours = (int(transactions_24_hours[i - 1]['timeStamp']) - twentyFourHours)
@@ -26,7 +27,7 @@ def init_sov_24_hours():
     
     transactionsList = []
     while k < len(transactions_24_hours):
-        transactionsList.append(k)
+        transactionsList.append(transactions_24_hours[k])
         k += 1
 
     return transactionsList
@@ -46,6 +47,7 @@ def update_sov_24_hours(transactions):
         else:
             transactions.append(update[k])
             transactions.pop(0)
+            k += 1
     
     return transactions
 
@@ -73,8 +75,8 @@ def total_sov():
 #latest gas price paid for minting 1 SOV coin
 def latest_avg():
     api = accounts.Account(address=address, api_key=api_key)
-    avg = api.get_transaction_page(page=1)
-    latest = avg[1]['gasPrice']
+    avg = api.get_transaction_page(page=1, offset=1)
+    latest = avg[0]['gasPrice']
     return latest
 
 #Percent of total supply mined
@@ -84,3 +86,12 @@ def percent_mined():
     percent = currentSupply / maxSupply
 
     return percent
+
+#get number of holders by scraping Etherscan website
+def get_number_of_holders():
+    page = requests.get("https://etherscan.io/token/0x010589b7c33034b802f7dba2c88cc9cec0f46673")
+    tree = html.fromstring(page.content)
+
+    holders = tree.xpath('//div[@class="col-md-8"]/text()')
+    pHolders = holders[0]
+    return pHolders
